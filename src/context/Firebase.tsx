@@ -103,10 +103,18 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 
   const loginWithGoogle = async () => {
     const res = await signInWithPopup(firebaseAuth, googleProvider);
-    await addDoc(collection(firestore, "exercises"), {
-      userEmail: res.user.email,
-      userID: res.user.uid,
-    });
+
+    const userEmail = res.user.email;
+    const collectionRef = collection(firestore, "exercises");
+    const q = query(collectionRef, where("userEmail", "==", userEmail));
+    const result = await getDocs(q);
+    const id = result.docs.length === 0;
+    if (id) {
+      await addDoc(collection(firestore, "exercises"), {
+        userEmail: res.user.email,
+        userID: res.user.uid,
+      });
+    }
   };
 
   const handleSignOut = async () => {
