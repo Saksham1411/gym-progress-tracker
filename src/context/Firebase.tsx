@@ -119,6 +119,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 
   const handleSignOut = async () => {
     await signOut(firebaseAuth);
+    setUserDbId(null);
   };
 
   const handleCreateNewExercise = async (name: string) => {
