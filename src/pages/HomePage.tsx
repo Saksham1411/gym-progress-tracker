@@ -17,6 +17,7 @@ const HomePage = () => {
     <div>
       <Header />
       <Accordian />
+      <div className="w-full h-8 bg-white"></div>
     </div>
   );
 };
