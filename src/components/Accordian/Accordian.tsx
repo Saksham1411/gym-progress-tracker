@@ -14,24 +14,29 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { AddNewEntryModal } from "../Modal/AddNewEntryModal";
+import { useFirebase } from "../../context/Firebase";
+import { useExerciseContext } from "../../context/ExerciseContext";
+import { Modal } from "../ui/animated-modal";
 
 const Accordian = () => {
-  const [exerciseList, setExerciseList] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const firebase: any = useFirebase();
+  const { exerciseList, setExerciseList }: any = useExerciseContext();
+
   useEffect(() => {
-    const gymTracker = localStorage.getItem("gym-tracker");
-    if (gymTracker != null) {
-      const prevExercise = JSON.parse(gymTracker);
-      setExerciseList([...prevExercise]);
-    }
-  }, []);
+    const getData = async () => {
+      const result = await firebase.handleGetUserData();
+      setExerciseList(result);
+    };
+    if (firebase.isLoggedin) getData();
+  }, [firebase]);
 
   const filteredList = useMemo(
     () =>
       search === ""
         ? exerciseList
-        : exerciseList.filter((exercise) =>
-            exercise.exercise.toLowerCase().includes(search.toLowerCase())
+        : exerciseList.filter((exercise:any) =>
+            exercise.name.toLowerCase().includes(search.toLowerCase())
           ),
     [search, exerciseList]
   );
@@ -48,9 +53,9 @@ const Accordian = () => {
         <i className="fa-solid fa-magnifying-glass absolute right-6"></i>
       </div>
       <Accordion type="single" collapsible className="sm:w-full">
-        {filteredList.map((exercise, idx) => (
+        {filteredList.map((exercise:any, idx:number) => (
           <AccordionItem value={`item-${idx}`} key={idx}>
-            <AccordionTrigger>{exercise.exercise}</AccordionTrigger>
+            <AccordionTrigger>{exercise.name}</AccordionTrigger>
 
             <AccordionContent className="flex flex-col items-center">
               <Table>
@@ -61,7 +66,7 @@ const Accordian = () => {
                     <TableHead>Weight</TableHead>
                   </TableRow>
                 </TableHeader>
-                {exercise.data.map((data: any, idx: number) => (
+                {exercise.data?.map((data: any, idx: number) => (
                   <TableBody key={idx}>
                     <TableRow>
                       <TableCell className="font-medium">{data.date}</TableCell>
@@ -71,7 +76,9 @@ const Accordian = () => {
                   </TableBody>
                 ))}
               </Table>
-              <AddNewEntryModal exercise={exercise} />
+              <Modal>
+                <AddNewEntryModal exercise={exercise} />
+              </Modal>
             </AccordionContent>
           </AccordionItem>
         ))}
