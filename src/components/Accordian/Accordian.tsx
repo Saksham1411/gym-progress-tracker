@@ -17,16 +17,20 @@ import { AddNewEntryModal } from "../Modal/AddNewEntryModal";
 import { useFirebase } from "../../context/Firebase";
 import { useExerciseContext } from "../../context/ExerciseContext";
 import { Modal } from "../ui/animated-modal";
+import Loader from "../ui/Loader";
 
 const Accordian = () => {
   const [search, setSearch] = useState("");
   const firebase: any = useFirebase();
-  const { exerciseList, setExerciseList }: any = useExerciseContext();
+  const { exerciseList, setExerciseList, isLoading, setIsLoading }: any =
+    useExerciseContext();
 
   useEffect(() => {
     const getData = async () => {
+      setIsLoading(true);
       const result = await firebase.handleGetUserData();
       setExerciseList(result);
+      setIsLoading(false);
     };
     if (firebase.isLoggedin) getData();
   }, [firebase]);
@@ -35,7 +39,7 @@ const Accordian = () => {
     () =>
       search === ""
         ? exerciseList
-        : exerciseList.filter((exercise:any) =>
+        : exerciseList.filter((exercise: any) =>
             exercise.name.toLowerCase().includes(search.toLowerCase())
           ),
     [search, exerciseList]
@@ -52,11 +56,11 @@ const Accordian = () => {
         />
         <i className="fa-solid fa-magnifying-glass absolute right-6"></i>
       </div>
+      {isLoading ? <div className="flex justify-center items-center h-[50vh]"><Loader/></div>:
       <Accordion type="single" collapsible className="sm:w-full">
-        {filteredList.map((exercise:any, idx:number) => (
+        {filteredList.map((exercise: any, idx: number) => (
           <AccordionItem value={`item-${idx}`} key={idx}>
             <AccordionTrigger>{exercise.name}</AccordionTrigger>
-
             <AccordionContent className="flex flex-col items-center">
               <Table>
                 <TableHeader>
@@ -82,7 +86,7 @@ const Accordian = () => {
             </AccordionContent>
           </AccordionItem>
         ))}
-      </Accordion>
+      </Accordion>}
     </div>
   );
 };

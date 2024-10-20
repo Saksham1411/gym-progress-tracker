@@ -13,15 +13,17 @@ import React, {
 interface ModalContextType {
   open: boolean;
   setOpen: (open: boolean) => void;
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
   return (
-    <ModalContext.Provider value={{ open, setOpen }}>
+    <ModalContext.Provider value={{ open, setOpen, isLoading, setIsLoading }}>
       {children}
     </ModalContext.Provider>
   );
