@@ -47,6 +47,7 @@ interface FirebaseContextType {
   loginUserWithEmailAndPassword: (email: string, password: string) => void;
   loginWithGoogle: () => void;
   isLoggedin: boolean;
+  loadingLoggedinUser: boolean;
   userEmail: string;
   handleCreateNewExercise: (name: string) => void;
   handleGetUserData: () => void;
@@ -68,12 +69,14 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 }) => {
   const [user, setUser] = useState<any>(null);
   const [userDbId, setUserDbId] = useState<any>(null);
+  const [loadingLoggedinUser, setLoadingLoggedinUser] = useState(true);
   const [trigger, settrigger] = useState(true);
 
   useEffect(() => {
     onAuthStateChanged(firebaseAuth, (user) => {
       if (user) setUser(user);
       else setUser(null);
+      setLoadingLoggedinUser(false);
     });
   }, []);
 
@@ -180,6 +183,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
         handleExerciseDataUpdate,
         userEmail: user?.email,
         handleSignOut,
+        loadingLoggedinUser
       }}
     >
       {children}
